@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lingualite – Sprachen lernen</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+  <div class="app-container">
+    <header>
+      <div class="logo">
+        <i class="fas fa-language logo-icon"></i>
+        <h1>Lingualite – Sprachen lernen</h1>
+      </div>
+      <nav class="nav">
+        <button type="button" class="nav-btn active" data-view="learn">
+          <i class="fas fa-book"></i> Lernen
+        </button>
+        <button type="button" class="nav-btn" data-view="decks">
+          <i class="fas fa-layer-group"></i> Decks
+        </button>
+        <button type="button" class="nav-btn icon-btn" data-view="settings" title="Einstellungen">
+          <i class="fas fa-cog"></i>
+        </button>
+      </nav>
+    </header>
+
+    <main>
+      <aside class="sidebar">
+        <h2>Deine Statistik</h2>
+        <div class="stats">
+          <div class="stat-card">
+            <h3 id="learned-words">0</h3>
+            <p>Gelernte Wörter</p>
+          </div>
+          <div class="stat-card">
+            <h3 id="active-days">1</h3>
+            <p>Aktive Tage</p>
+          </div>
+          <div class="stat-card">
+            <h3 id="success-rate">0%</h3>
+            <p>Erfolgsrate</p>
+          </div>
+        </div>
+        
+        <h2>Sprachen</h2>
+        <div class="lang-tabs">
+          <div class="lang-tab active" data-lang="all">Alle</div>
+          <div class="lang-tab" data-lang="en">Englisch</div>
+          <div class="lang-tab" data-lang="es">Spanisch</div>
+          <div class="lang-tab" data-lang="fr">Französisch</div>
+        </div>
+      </aside>
+
+      <div class="content">
+        <section id="view-learn" class="view active">
+          <div class="panel">
+            <h2>Lernsession - Satzpuzzle</h2>
+            <div class="row">
+              <div class="form-group" style="flex: 1;">
+                <label for="deckSelect">Deck auswählen</label>
+                <select id="deckSelect" class="input">
+                  <option value="basic-en">Englisch Grundwortschatz</option>
+                  <option value="basic-es">Spanisch Grundwortschatz</option>
+                  <option value="basic-fr">Französisch Grundwortschatz</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <button type="button" id="startBtn" class="btn btn-primary">
+                  <i class="fas fa-play"></i> Session starten
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="session-header">
+              <h2 id="session-title">Bereit zum Lernen</h2>
+              <div class="session-progress">
+                <div class="progress-text" id="progress-text">0/50 Karten</div>
+                <div class="progress">
+                  <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
+                </div>
+              </div>
+            </div>
+            <div id="learnArea" class="card">
+              <p>Wähle ein Deck und starte eine Lernsession mit Satzpuzzles.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="view-decks" class="view">
+          <div class="panel">
+            <h2>Verfügbare Decks</h2>
+            <div class="deck-list" id="deckList">
+              <!-- Wird durch JavaScript befüllt -->
+            </div>
+          </div>
+        </section>
+
+        <section id="view-settings" class="view">
+          <div class="panel">
+            <h2>Einstellungen</h2>
+            <div class="form-group">
+              <label for="importFile">Deck importieren (JSON)</label>
+              <input type="file" id="importFile" class="input" accept=".json">
+            </div>
+            <div class="row">
+              <button type="button" id="importBtn" class="btn btn-secondary">
+                <i class="fas fa-file-import"></i> Importieren
+              </button>
+              <button type="button" id="exportBtn" class="btn btn-secondary">
+                <i class="fas fa-file-export"></i> Exportieren
+              </button>
+            </div>
+            
+            <div class="form-group" style="margin-top: 20px;">
+              <h3>Deck-Schema</h3>
+              <pre class="code">
+{
+  "name": "Deck-Name",
+  "language": "en",
+  "cards": [
+    {
+      "front": "Haus",
+      "back": "house",
+      "example": "This is a beautiful house."
+    }
+  ]
+}</pre>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
