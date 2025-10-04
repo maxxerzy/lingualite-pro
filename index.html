@@ -48,24 +48,18 @@
         <h2>Sprachen</h2>
         <div class="lang-tabs">
           <div class="lang-tab active" data-lang="all">Alle</div>
-          <div class="lang-tab" data-lang="en">Englisch</div>
-          <div class="lang-tab" data-lang="es">Spanisch</div>
-          <div class="lang-tab" data-lang="fr">Französisch</div>
+          <div class="lang-tab" data-lang="da">Dänisch</div>
         </div>
       </aside>
 
       <div class="content">
         <section id="view-learn" class="view active">
           <div class="panel">
-            <h2>Lernsession - Satzpuzzle</h2>
+            <h2>Lernsession – Wörtervergleich</h2>
             <div class="row">
               <div class="form-group" style="flex: 1;">
                 <label for="deckSelect">Deck auswählen</label>
-                <select id="deckSelect" class="input">
-                  <option value="basic-en">Englisch Grundwortschatz</option>
-                  <option value="basic-es">Spanisch Grundwortschatz</option>
-                  <option value="basic-fr">Französisch Grundwortschatz</option>
-                </select>
+                <select id="deckSelect" class="input"></select>
               </div>
               <div class="form-group">
                 <button type="button" id="startBtn" class="btn btn-primary">
@@ -79,14 +73,14 @@
             <div class="session-header">
               <h2 id="session-title">Bereit zum Lernen</h2>
               <div class="session-progress">
-                <div class="progress-text" id="progress-text">0/50 Karten</div>
+                <div class="progress-text" id="progress-text">0/0 Karten</div>
                 <div class="progress">
                   <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
                 </div>
               </div>
             </div>
             <div id="learnArea" class="card">
-              <p>Wähle ein Deck und starte eine Lernsession mit Satzpuzzles.</p>
+              <p>Wähle ein Deck und starte eine Lernsession mit Wörtervergleichen.</p>
             </div>
           </div>
         </section>
@@ -121,12 +115,12 @@
               <pre class="code">
 {
   "name": "Deck-Name",
-  "language": "en",
+  "language": "da",
   "cards": [
     {
       "front": "Haus",
-      "back": "house",
-      "example": "This is a beautiful house."
+      "back": "hus",
+      "example": "Det er et smukt hus."
     }
   ]
 }</pre>

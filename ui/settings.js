@@ -34,7 +34,7 @@ export function handleImport() {
 // Handle export
 export function handleExport() {
   const decks = getDecks();
-  const deck = decks['basic-en'];
+  const deck = decks['basic-da'];
 
   if (!deck) {
     alert('Kein Beispiel-Deck zum Export gefunden.');
