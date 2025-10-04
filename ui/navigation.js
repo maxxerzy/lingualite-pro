@@ -1,4 +1,4 @@
-import { getDecks } from '../data/decks.js';
+import { getDecks } from '../core/state.js';
 
 // Initialize navigation
 export function initNavigation() {
@@ -22,76 +22,75 @@ export function initNavigation() {
 
 // Initialize decks view
 export function initDecksView() {
-  const decks = getDecks();
+  renderDecks('all');
+}
+
+// Filter decks by language
+export function filterDecksByLanguage(lang) {
+  renderDecks(lang);
+}
+
+function renderDecks(languageFilter) {
   const deckList = document.getElementById('deckList');
-  deckList.innerHTML = '';
-  
-  for (const [id, deck] of Object.entries(decks)) {
+  const fragment = document.createDocumentFragment();
+  const entries = Object.entries(getDecks()).sort(([, a], [, b]) =>
+    a.name.localeCompare(b.name, 'de')
+  );
+  let hasDecks = false;
+
+  entries.forEach(([id, deck]) => {
+    if (languageFilter !== 'all' && deck.language !== languageFilter) {
+      return;
+    }
+
     const deckItem = document.createElement('div');
     deckItem.className = 'deck-item';
     deckItem.innerHTML = `
       <h3>${deck.name}</h3>
       <p>${deck.cards.length} Karten • Sprache: ${getLanguageName(deck.language)}</p>
-      <button class="btn btn-primary" data-deck="${id}">
+      <button class="btn btn-primary">
         <i class="fas fa-play"></i> Lernsession starten
       </button>
     `;
-    deckList.appendChild(deckItem);
-  }
-  
-  // Add event listeners to deck buttons
-  document.querySelectorAll('[data-deck]').forEach(button => {
-    button.addEventListener('click', () => {
-      const deckId = button.getAttribute('data-deck');
-      document.getElementById('deckSelect').value = deckId;
-      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelector('[data-view="learn"]').classList.add('active');
-      document.querySelectorAll('.view').forEach(view => view.classList.remove('active'));
-      document.getElementById('view-learn').classList.add('active');
+
+    const startButton = deckItem.querySelector('button');
+    startButton.addEventListener('click', () => {
+      selectDeck(id);
     });
+
+    fragment.appendChild(deckItem);
+    hasDecks = true;
   });
+
+  if (hasDecks) {
+    deckList.replaceChildren(fragment);
+  } else {
+    deckList.innerHTML = `
+      <div class="empty-state">
+        <p>Für diese Sprache sind aktuell keine Decks verfügbar.</p>
+      </div>
+    `;
+  }
 }
 
-// Filter decks by language
-export function filterDecksByLanguage(lang) {
-  const decks = getDecks();
-  const deckList = document.getElementById('deckList');
-  deckList.innerHTML = '';
-  
-  for (const [id, deck] of Object.entries(decks)) {
-    if (lang === 'all' || deck.language === lang) {
-      const deckItem = document.createElement('div');
-      deckItem.className = 'deck-item';
-      deckItem.innerHTML = `
-        <h3>${deck.name}</h3>
-        <p>${deck.cards.length} Karten • Sprache: ${getLanguageName(deck.language)}</p>
-        <button class="btn btn-primary" data-deck="${id}">
-          <i class="fas fa-play"></i> Lernsession starten
-        </button>
-      `;
-      deckList.appendChild(deckItem);
-    }
+function selectDeck(deckId) {
+  const deckSelect = document.getElementById('deckSelect');
+  if (deckSelect) {
+    deckSelect.value = deckId;
   }
-  
-  // Re-add event listeners to deck buttons
-  document.querySelectorAll('[data-deck]').forEach(button => {
-    button.addEventListener('click', () => {
-      const deckId = button.getAttribute('data-deck');
-      document.getElementById('deckSelect').value = deckId;
-      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelector('[data-view="learn"]').classList.add('active');
-      document.querySelectorAll('.view').forEach(view => view.classList.remove('active'));
-      document.getElementById('view-learn').classList.add('active');
-    });
-  });
+
+  document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+  document.querySelector('[data-view="learn"]').classList.add('active');
+  document.querySelectorAll('.view').forEach(view => view.classList.remove('active'));
+  document.getElementById('view-learn').classList.add('active');
 }
 
 // Get language name from code
 function getLanguageName(code) {
   const languages = {
-    'en': 'Englisch',
-    'es': 'Spanisch',
-    'fr': 'Französisch'
+    en: 'Englisch',
+    es: 'Spanisch',
+    fr: 'Französisch'
   };
   return languages[code] || code;
 }

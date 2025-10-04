@@ -1,5 +1,6 @@
 import { getDecks, getCurrentSession, setCurrentSession, getUserStats, setUserStats } from './state.js';
 import { updateProgress } from './progress.js';
+import { updateStats } from './stats.js';
 import { shuffleArray, normalizeText } from '../utils/helpers.js';
 
 // Start a learning session
@@ -145,8 +146,9 @@ function checkPuzzleAnswer(card, target) {
   
   userStats.successRate = Math.round((currentSession.correctAnswers / currentSession.currentIndex) * 100);
   setUserStats(userStats);
+  updateStats();
   setCurrentSession(currentSession);
-  
+
   document.getElementById('nextCard').addEventListener('click', showNextCard);
 }
 

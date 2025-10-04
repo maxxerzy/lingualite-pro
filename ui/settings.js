@@ -1,4 +1,4 @@
-import { getDecks } from '../data/decks.js';
+import { getDecks } from '../core/state.js';
 
 // Initialize settings
 export function initSettings() {
@@ -34,8 +34,15 @@ export function handleImport() {
 // Handle export
 export function handleExport() {
   const decks = getDecks();
+  const deck = decks['basic-en'];
+
+  if (!deck) {
+    alert('Kein Beispiel-Deck zum Export gefunden.');
+    return;
+  }
+
   // In a real application, you would export the actual data
-  const dataStr = JSON.stringify(decks['basic-en'], null, 2);
+  const dataStr = JSON.stringify(deck, null, 2);
   const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
   
   const exportFileDefaultName = 'lingualite_export.json';

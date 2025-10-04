@@ -1,3 +1,5 @@
+import { decks } from '../js/data/decks.js';
+
 // Application state
 let currentSession = null;
 let userStats = {
@@ -5,6 +7,11 @@ let userStats = {
   activeDays: 1,
   successRate: 0
 };
+
+// Data access helpers
+export function getDecks() {
+  return decks;
+}
 
 // Export state for other modules
 export function getCurrentSession() {
@@ -20,5 +27,5 @@ export function getUserStats() {
 }
 
 export function setUserStats(stats) {
-  userStats = stats;
+  userStats = { ...stats };
 }
