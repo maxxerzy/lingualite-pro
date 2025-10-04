@@ -3,6 +3,7 @@ import { initNavigation, initDecksView, filterDecksByLanguage } from './ui/navig
 import { initSettings, handleImport, handleExport } from './ui/settings.js';
 import { startSession, showNextCard } from './core/session.js';
 import { updateStats } from './core/stats.js';
+import './integrations/react-bits-explorer.js';
 
 // Application state
 let currentSession = null;
