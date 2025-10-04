@@ -1,0 +1,18 @@
+{
+  "name": "lingualite-pro",
+  "version": "1.0.0",
+  "description": "Lingualite Sprachlernoberfläche mit React Bits Playground",
+  "main": "index.html",
+  "scripts": {
+    "serve": "python3 -m http.server 4173",
+    "test": "echo \"No automated tests configured\""
+  },
+  "keywords": [
+    "lingualite",
+    "react-bits",
+    "language-learning"
+  ],
+  "author": "",
+  "license": "MIT",
+  "type": "module"
+}

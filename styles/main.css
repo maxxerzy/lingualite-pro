@@ -467,3 +467,72 @@ label {
   background: var(--primary);
   color: white;
 }
+
+/* React Bits integration */
+.panel-description {
+  color: var(--gray);
+  margin-bottom: 12px;
+}
+
+.react-bits-root {
+  border: 1px dashed var(--light-gray);
+  border-radius: var(--border-radius);
+  background: rgba(67, 97, 238, 0.04);
+  min-height: 160px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.react-bits-placeholder {
+  color: var(--gray);
+  font-style: italic;
+  text-align: center;
+}
+
+.react-bits-content {
+  width: 100%;
+}
+
+.react-bits-hint {
+  color: var(--gray);
+  margin-bottom: 12px;
+}
+
+.react-bits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.react-bits-chip {
+  padding: 10px 12px;
+  border-radius: 9999px;
+  border: 1px solid rgba(67, 97, 238, 0.25);
+  background: white;
+  color: var(--primary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: 0 2px 4px rgba(67, 97, 238, 0.08);
+}
+
+.react-bits-chip:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.react-bits-error {
+  color: #ae2012;
+  font-weight: 500;
+  text-align: center;
+}
+
+.react-bits-footer {
+  margin-top: 16px;
+  font-size: 0.9rem;
+  color: var(--gray);
+}
