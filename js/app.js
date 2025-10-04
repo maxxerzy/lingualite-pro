@@ -1,60 +1,68 @@
-import { decks } from './data/decks.js';
-import { initNavigation, initDecksView, filterDecksByLanguage } from './ui/navigation.js';
-import { initSettings, handleImport, handleExport } from './ui/settings.js';
-import { startSession, showNextCard } from './core/session.js';
-import { updateStats } from './core/stats.js';
+import { initNavigation, initDecksView, filterDecksByLanguage } from '../ui/navigation.js';
+import { initSettings, handleImport, handleExport } from '../ui/settings.js';
+import { startSession } from '../core/session.js';
+import { updateStats } from '../core/stats.js';
+import { getDecks } from '../core/state.js';
 import './integrations/react-bits-explorer.js';
 
-// Application state
-let currentSession = null;
-let userStats = {
-  learnedWords: 0,
-  activeDays: 1,
-  successRate: 0
-};
-
-// Export state for other modules
-export function getCurrentSession() {
-  return currentSession;
-}
-
-export function setCurrentSession(session) {
-  currentSession = session;
-}
-
-export function getUserStats() {
-  return userStats;
-}
-
-export function setUserStats(stats) {
-  userStats = stats;
-  updateStats();
-}
-
-export function getDecks() {
-  return decks;
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-  // Initialize the application
+document.addEventListener('DOMContentLoaded', () => {
   initNavigation();
   initDecksView();
+  populateDeckSelect();
   updateStats();
   initSettings();
 
-  // Set up event listeners
-  document.getElementById('startBtn').addEventListener('click', startSession);
-  
-  // Language tabs
-  document.querySelectorAll('.lang-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      document.querySelectorAll('.lang-tab').forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      filterDecksByLanguage(tab.dataset.lang);
-    });
-  });
-  
-  // Make functions available globally for HTML onclick attributes
+  const startButton = document.getElementById('startBtn');
+  if (startButton) {
+    startButton.addEventListener('click', startSession);
+  }
+
+  setupLanguageTabs();
+
   window.handleImport = handleImport;
   window.handleExport = handleExport;
 });
+
+function populateDeckSelect() {
+  const deckSelect = document.getElementById('deckSelect');
+  if (!deckSelect) {
+    return;
+  }
+
+  const decks = getDecks();
+  const previousSelection = deckSelect.value;
+  const fragment = document.createDocumentFragment();
+  const sortedDecks = Object.entries(decks).sort(([, a], [, b]) =>
+    a.name.localeCompare(b.name, 'de')
+  );
+
+  sortedDecks.forEach(([id, deck]) => {
+    const option = document.createElement('option');
+    option.value = id;
+    option.textContent = deck.name;
+    fragment.appendChild(option);
+  });
+
+  deckSelect.replaceChildren(fragment);
+
+  if (previousSelection && decks[previousSelection]) {
+    deckSelect.value = previousSelection;
+  } else {
+    const firstDeckId = sortedDecks[0]?.[0];
+    if (firstDeckId) {
+      deckSelect.value = firstDeckId;
+    }
+  }
+}
+
+function setupLanguageTabs() {
+  const tabs = document.querySelectorAll('.lang-tab');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const language = tab.dataset.lang || 'all';
+      filterDecksByLanguage(language);
+    });
+  });
+}
