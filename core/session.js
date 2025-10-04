@@ -1,7 +1,7 @@
 import { getDecks, getCurrentSession, setCurrentSession, getUserStats, setUserStats } from './state.js';
 import { updateProgress } from './progress.js';
 import { updateStats } from './stats.js';
-import { shuffleArray, normalizeText } from '../utils/helpers.js';
+import { shuffleArray } from '../utils/helpers.js';
 
 // Start a learning session
 export function startSession() {
@@ -19,7 +19,8 @@ export function startSession() {
     deck: deck,
     cards: [...deck.cards], // Copy of cards
     currentIndex: 0,
-    correctAnswers: 0
+    correctAnswers: 0,
+    currentPrompt: null
   };
   
   // Shuffle the cards
@@ -43,87 +44,87 @@ export function showNextCard() {
   }
   
   const card = currentSession.cards[currentSession.currentIndex];
-  renderPuzzleCard(card);
+  const prompt = createComparisonPrompt(card, currentSession.cards);
+  renderComparisonCard(card, prompt);
   currentSession.currentIndex++;
+  currentSession.currentPrompt = { ...prompt, card };
   setCurrentSession(currentSession);
   updateProgress();
 }
 
-// Render a puzzle card
-function renderPuzzleCard(card) {
+function createComparisonPrompt(card, cards) {
+  if (cards.length <= 1) {
+    return { translation: card.back, isMatch: true };
+  }
+
+  const shouldMatch = Math.random() < 0.5;
+  if (shouldMatch) {
+    return { translation: card.back, isMatch: true };
+  }
+
+  const alternatives = cards.filter(candidate => candidate.back !== card.back);
+  if (alternatives.length === 0) {
+    return { translation: card.back, isMatch: true };
+  }
+
+  const randomIndex = Math.floor(Math.random() * alternatives.length);
+  return { translation: alternatives[randomIndex].back, isMatch: false };
+}
+
+// Render a comparison card
+function renderComparisonCard(card, prompt) {
   const learnArea = document.getElementById('learnArea');
-  const target = card.example || card.back;
-  const tokens = target.split(/\s+/).filter(word => word.length > 0);
-  const shuffledTokens = shuffleArray([...tokens]);
-  
   learnArea.innerHTML = `
     <div class="q">${card.front}</div>
-    <div id="bank">${shuffledTokens.map(token => 
-      `<button type="button" class="token-btn">${token}</button>`
-    ).join('')}</div>
-    <div id="assembled"></div>
+    <p class="prompt">Stimmt diese Übersetzung?</p>
+    <div class="comparison-card">
+      <span class="word word-source">${card.front}</span>
+      <i class="fas fa-arrow-right"></i>
+      <span class="word word-target">${prompt.translation}</span>
+    </div>
     <div class="actions">
-      <button type="button" class="btn btn-primary" id="checkPuzzle">Prüfen</button>
-      <button type="button" class="btn btn-secondary" id="skipCard">Überspringen</button>
+      <button type="button" class="btn btn-primary" id="answerMatch">Passt</button>
+      <button type="button" class="btn btn-secondary" id="answerMismatch">Passt nicht</button>
+      <button type="button" class="btn" id="skipCard">Überspringen</button>
     </div>
     <div id="fb"></div>
   `;
-  
-  // Add event listeners to token buttons
-  document.querySelectorAll('.token-btn').forEach(button => {
-    button.addEventListener('click', function() {
-      const assembled = document.getElementById('assembled');
-      const wordToken = document.createElement('span');
-      wordToken.className = 'word-token';
-      wordToken.textContent = this.textContent;
-      wordToken.dataset.originalIndex = Array.from(this.parentNode.children).indexOf(this);
-      
-      // Add click event to move word back to bank
-      wordToken.addEventListener('click', function() {
-        const originalIndex = this.dataset.originalIndex;
-        const bank = document.getElementById('bank');
-        const originalButton = bank.children[originalIndex];
-        
-        // Re-enable the original button
-        originalButton.disabled = false;
-        
-        // Remove the word token
-        this.remove();
-      });
-      
-      assembled.appendChild(wordToken);
-      this.disabled = true;
-    });
+
+  document.getElementById('answerMatch').addEventListener('click', () => {
+    checkComparisonAnswer(true);
   });
-  
-  // Add event listener to check button
-  document.getElementById('checkPuzzle').addEventListener('click', function() {
-    checkPuzzleAnswer(card, target);
+
+  document.getElementById('answerMismatch').addEventListener('click', () => {
+    checkComparisonAnswer(false);
   });
-  
-  // Add event listener to skip button
-  document.getElementById('skipCard').addEventListener('click', function() {
+
+  document.getElementById('skipCard').addEventListener('click', () => {
     showNextCard();
   });
 }
 
-// Check the puzzle answer
-function checkPuzzleAnswer(card, target) {
-  const assembled = document.getElementById('assembled');
+// Check the comparison answer
+function checkComparisonAnswer(userSaysMatch) {
   const feedback = document.getElementById('fb');
-  const userAnswer = Array.from(assembled.children)
-    .map(token => token.textContent)
-    .join(' ')
-    .trim();
-  
   const currentSession = getCurrentSession();
   const userStats = getUserStats();
-  
-  if (normalizeText(userAnswer) === normalizeText(target)) {
+  const prompt = currentSession?.currentPrompt;
+
+  if (!prompt) {
+    return;
+  }
+
+  document.querySelectorAll('#learnArea .actions button').forEach(button => {
+    button.disabled = true;
+  });
+
+  const isCorrect = userSaysMatch === prompt.isMatch;
+
+  if (isCorrect) {
     feedback.innerHTML = `
       <div class="correct">
         <p>✅ Richtig!</p>
-        <p>Lösung: <b>${target}</b></p>
+        <p>Richtige Zuordnung: <b>${prompt.card.front}</b> → <b>${prompt.card.back}</b></p>
       </div>
       <div class="actions" style="margin-top: 16px;">
         <button type="button" class="btn btn-primary" id="nextCard">Weiter</button>
@@ -135,18 +136,18 @@ function checkPuzzleAnswer(card, target) {
     feedback.innerHTML = `
       <div class="incorrect">
         <p>❌ Falsch!</p>
-        <p>Deine Antwort: <b>${userAnswer}</b></p>
-        <p>Richtige Lösung: <b>${target}</b></p>
+        <p>Korrekt wäre: <b>${prompt.card.front}</b> → <b>${prompt.card.back}</b></p>
       </div>
       <div class="actions" style="margin-top: 16px;">
         <button type="button" class="btn btn-primary" id="nextCard">Weiter</button>
       </div>
     `;
   }
-  
+
   userStats.successRate = Math.round((currentSession.correctAnswers / currentSession.currentIndex) * 100);
   setUserStats(userStats);
   updateStats();
+  currentSession.currentPrompt = null;
   setCurrentSession(currentSession);
 
   document.getElementById('nextCard').addEventListener('click', showNextCard);

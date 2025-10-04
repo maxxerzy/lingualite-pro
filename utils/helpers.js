@@ -8,11 +8,3 @@ export function shuffleArray(array) {
   return newArray;
 }
 
-// Utility function to normalize text for comparison
-export function normalizeText(text) {
-  return text.toLowerCase()
-    .replace(/[.,?!;:'"]/g, '')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .trim();
-}
